@@ -8,7 +8,6 @@ import "C"
 import (
 	"fmt"
 	"log"
-	"reflect"
 	"unsafe"
 )
 
@@ -25,35 +24,6 @@ func Main() {
 
 func Quit() {
 	C.clutter_main_quit()
-}
-
-type Actor struct {
-	C *C.ClutterActor
-}
-
-func NewStage() Actor {
-	return Actor{
-		C: C.clutter_stage_new(),
-	}
-}
-
-func NewActorFromC(p interface{}) Actor {
-	return Actor{
-		C: (*C.ClutterActor)(unsafe.Pointer(reflect.ValueOf(p).Pointer())),
-	}
-}
-
-func (actor Actor) Show() {
-	C.clutter_actor_show(actor.C)
-}
-
-func (actor Actor) AddChild(c interface{}) {
-	switch child := c.(type) {
-	case *C.ClutterActor:
-		C.clutter_actor_add_child(actor.C, child)
-	case Actor:
-		C.clutter_actor_add_child(actor.C, child.C)
-	}
 }
 
 func NewColorFromString(s string) *C.ClutterColor {

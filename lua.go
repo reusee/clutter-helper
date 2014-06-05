@@ -25,7 +25,7 @@ import (
 	"log"
 	"unsafe"
 
-	"../lgo"
+	"github.com/reusee/lgo"
 )
 
 func FromLua(code string) map[string]unsafe.Pointer {
@@ -265,11 +265,25 @@ func FromLua(code string) map[string]unsafe.Pointer {
 		return pointer
 	}
 
+	processBoxArgs := func(box *C.ClutterLayoutManager, args map[string]interface{}) {
+		//TODO
+	}
+
 	lua.RegisterFunctions(map[string]interface{}{
+
+		// actors
 
 		"Actor": func(args map[interface{}]interface{}) unsafe.Pointer {
 			actor := C.clutter_actor_new()
 			return processActorArgs(actor, args)
+		},
+
+		"Stage": func(args map[interface{}]interface{}) unsafe.Pointer {
+			actor := C.clutter_stage_new()
+			C.clutter_actor_show(actor)
+			pointer := processActorArgs(actor, args)
+			//TODO stage specific properties
+			return pointer
 		},
 
 		"Text": func(args map[interface{}]interface{}) unsafe.Pointer {
@@ -283,12 +297,24 @@ func FromLua(code string) map[string]unsafe.Pointer {
 					switch key {
 					case "text":
 						C.clutter_text_set_text(text, toGStr(v.(string)))
+					case "use_markup":
+						b := C.FALSE
+						if v.(bool) {
+							b = C.TRUE
+						}
+						C.clutter_text_set_use_markup(text, C.gboolean(b))
+					case "markup":
+						C.clutter_text_set_markup(text, toGStr(v.(string)))
+					case "color":
+						C.clutter_text_set_color(text, NewColorFromString(v.(string)))
 					}
 				case float64:
 				}
 			}
 			return pointer
 		},
+
+		// data structures
 
 		"Point": func(args []float64) unsafe.Pointer {
 			var point C.ClutterPoint
@@ -317,16 +343,41 @@ func FromLua(code string) map[string]unsafe.Pointer {
 			return unsafe.Pointer(&rect)
 		},
 
+		// contents
+
 		"Image": func(args []string) unsafe.Pointer {
 			//TODO set data
 			image := C.clutter_image_new()
 			return unsafe.Pointer(image)
 		},
 
+		// layouts
+
 		"Box": func(args map[string]interface{}) unsafe.Pointer {
 			box := C.clutter_box_layout_new()
-			//TODO set properties
+			processBoxArgs(box, args)
 			return unsafe.Pointer(box)
+		},
+
+		"HBox": func(args map[string]interface{}) unsafe.Pointer {
+			box := C.clutter_box_layout_new()
+			C.clutter_box_layout_set_orientation((*C.ClutterBoxLayout)(unsafe.Pointer(box)), C.CLUTTER_ORIENTATION_HORIZONTAL)
+			processBoxArgs(box, args)
+			return unsafe.Pointer(box)
+		},
+
+		"VBox": func(args map[string]interface{}) unsafe.Pointer {
+			box := C.clutter_box_layout_new()
+			C.clutter_box_layout_set_orientation((*C.ClutterBoxLayout)(unsafe.Pointer(box)), C.CLUTTER_ORIENTATION_VERTICAL)
+			processBoxArgs(box, args)
+			return unsafe.Pointer(box)
+		},
+
+		// effects
+
+		"Blur": func(args map[string]interface{}) unsafe.Pointer {
+			effect := C.clutter_blur_effect_new()
+			return unsafe.Pointer(effect)
 		},
 	})
 	lua.RunString(code)
