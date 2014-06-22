@@ -11,6 +11,7 @@ func TestBasic(t *testing.T) {
 	bindings := FromLua(`
 	Stage {
 		id = "stage",
+		title = "Test",
 		Actor{
 			id = "root",
 			bgcolor = "#0099CC",

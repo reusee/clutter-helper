@@ -282,7 +282,17 @@ func FromLua(code string) map[string]unsafe.Pointer {
 			actor := C.clutter_stage_new()
 			C.clutter_actor_show(actor)
 			pointer := processActorArgs(actor, args)
-			//TODO stage specific properties
+			stage := (*C.ClutterStage)(unsafe.Pointer(actor))
+			for k, v := range args {
+				//TODO other properties
+				switch key := k.(type) {
+				case string:
+					switch key {
+					case "title":
+						C.clutter_stage_set_title(stage, toGStr(v.(string)))
+					}
+				}
+			}
 			return pointer
 		},
 
