@@ -19,7 +19,7 @@ func TestBasic(t *testing.T) {
 			height = 300,
 			clip_rect = Rect{0, 0, 300, 200},
 			content_gravity = "top-right",
-			x = 300,
+			x = 100,
 			y = 50,
 			request_mode = "height",
 			rotation_angle_x = 30,
@@ -62,7 +62,23 @@ func TestBasic(t *testing.T) {
 				text_dir = "right",
 				text = "你好啊",
 			},
-		}
+		},
+		Text{
+			text = "左上",
+			Align{
+				source = "root",
+				axis = "both",
+				factor = 0.0,
+			}
+		},
+		Text{
+			text = "右下",
+			Align{
+				source = "root",
+				axis = "both",
+				factor = 1,
+			},
+		},
 	}
 	`)
 	g.GConnect(bindings["stage"], "destroy", func() {

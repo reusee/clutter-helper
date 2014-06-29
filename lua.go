@@ -389,6 +389,30 @@ func FromLua(code string) map[string]unsafe.Pointer {
 			effect := C.clutter_blur_effect_new()
 			return unsafe.Pointer(effect)
 		},
+
+		// constraints
+		"Align": func(args map[string]interface{}) unsafe.Pointer {
+			constraint := C.clutter_align_constraint_new(nil, C.CLUTTER_ALIGN_X_AXIS, 0)
+			align := (*C.ClutterAlignConstraint)(unsafe.Pointer(constraint))
+			for key, v := range args {
+				switch key {
+				case "source":
+					C.clutter_align_constraint_set_source(align, (*C.ClutterActor)(bindings[v.(string)]))
+				case "axis":
+					switch v.(string) {
+					case "x", "X":
+						C.clutter_align_constraint_set_align_axis(align, C.CLUTTER_ALIGN_X_AXIS)
+					case "y", "Y":
+						C.clutter_align_constraint_set_align_axis(align, C.CLUTTER_ALIGN_Y_AXIS)
+					case "both", "BOTH", "Both":
+						C.clutter_align_constraint_set_align_axis(align, C.CLUTTER_ALIGN_BOTH)
+					}
+				case "factor":
+					C.clutter_align_constraint_set_factor(align, C.gfloat(v.(float64)))
+				}
+			}
+			return unsafe.Pointer(constraint)
+		},
 	})
 	lua.RunString(code)
 	return bindings
