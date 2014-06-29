@@ -19,7 +19,7 @@ func TestBasic(t *testing.T) {
 			height = 300,
 			clip_rect = Rect{0, 0, 300, 200},
 			content_gravity = "top-right",
-			x = 100,
+			x = 300,
 			y = 50,
 			request_mode = "height",
 			rotation_angle_x = 30,

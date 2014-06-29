@@ -2,7 +2,9 @@ package clutter_helper
 
 /*
 #include <clutter/clutter.h>
-#cgo pkg-config: clutter-1.0
+#include <clutter-gtk/clutter-gtk.h>
+#include <gtk/gtk.h>
+#cgo pkg-config: clutter-1.0 clutter-gtk-1.0 gtk+-3.0
 */
 import "C"
 import (
@@ -15,15 +17,15 @@ var p = fmt.Printf
 
 func Init() {
 	var argc C.int
-	C.clutter_init(&argc, nil)
+	C.gtk_clutter_init(&argc, nil)
 }
 
 func Main() {
-	C.clutter_main()
+	C.gtk_main()
 }
 
 func Quit() {
-	C.clutter_main_quit()
+	C.gtk_main_quit()
 }
 
 func NewColorFromString(s string) *C.ClutterColor {

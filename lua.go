@@ -2,6 +2,8 @@ package clutter_helper
 
 /*
 #include <clutter/clutter.h>
+#include <clutter-gtk/clutter-gtk.h>
+#include <gtk/gtk.h>
 
 gboolean is_actor(void *o) {
 	return CLUTTER_IS_ACTOR(o);
@@ -279,8 +281,12 @@ func FromLua(code string) map[string]unsafe.Pointer {
 		},
 
 		"Stage": func(args map[interface{}]interface{}) unsafe.Pointer {
-			actor := C.clutter_stage_new()
+			window := C.gtk_window_new(C.GTK_WINDOW_TOPLEVEL)
+			embed := C.gtk_clutter_embed_new()
+			C.gtk_container_add((*C.GtkContainer)(unsafe.Pointer(window)), embed)
+			actor := C.gtk_clutter_embed_get_stage((*C.GtkClutterEmbed)(unsafe.Pointer(embed)))
 			C.clutter_actor_show(actor)
+			C.gtk_widget_show_all((*C.GtkWidget)(unsafe.Pointer(window)))
 			pointer := processActorArgs(actor, args)
 			stage := (*C.ClutterStage)(unsafe.Pointer(actor))
 			for k, v := range args {
